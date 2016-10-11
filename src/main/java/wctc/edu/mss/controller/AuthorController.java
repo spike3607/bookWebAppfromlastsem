@@ -80,22 +80,39 @@ public class AuthorController extends HttpServlet {
                 destination = "/listAuthors.jsp";
 
             } else if (action.equals("add")) {
-                // Hard coded for now
-                authService.addAuthor("Karry Hoof", new Date());
+//                // Hard coded for now
+//                authService.addAuthor("Kyle Hoof", new Date());
+
+                String newName = request.getParameter("newName");
+                System.out.println(newName);
+                authService.addAuthor(newName, new Date());
                 
-                destination = "/index.html";
+                List<Author> authors = null;
+                authors = authService.getAuthorList();
+                request.setAttribute("authors", authors);
+                destination = "/listAuthors.jsp";               
                 
             } else if (action.equals("update")) {
                 // Hard code for now
-                authService.updateAuthor(4,"author_name","Kathy Schoenauer");
+                authService.updateAuthor(4,"author_name","Test Schoenauer");
                 
-                destination = "/index.html";
+                List<Author> authors = null;
+                authors = authService.getAuthorList();
+                request.setAttribute("authors", authors);
+                destination = "/listAuthors.jsp";
                 
             } else if (action.equals("delete")) {
-                // Hard Coded
-                authService.deleteAuthor(1);
+//                // Hard Coded
+//                authService.deleteAuthor(5);
+
+                String id = request.getParameter("id");
+                System.out.println(id);
+                authService.deleteAuthor(Integer.valueOf(id));
                 
-                destination = "/index.html";
+                List<Author> authors = null;
+                authors = authService.getAuthorList();
+                request.setAttribute("authors", authors);
+                destination = "/listAuthors.jsp";
                 
             } else {
                 // Error

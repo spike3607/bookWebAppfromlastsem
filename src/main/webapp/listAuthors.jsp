@@ -24,6 +24,7 @@
                 <th align="left" class="tableHead">ID</th>
                 <th align="left" class="tableHead">Author Name</th>
                 <th align="right" class="tableHead">Date Added</th>
+                <th align="left" class="tableHead">Delete?</th>
             </tr>
         <c:forEach var="a" items="${authors}" varStatus="rowCount">
             <c:choose>
@@ -39,6 +40,7 @@
             <td align="right">
                 <fmt:formatDate pattern="M/d/yyyy" value="${a.dateAdded}"></fmt:formatDate>
             </td>
+            <td><a href="AuthorController?action=delete&id=${a.authorId}">delete</a></td>
         </tr>
         </c:forEach>
         </table>
@@ -46,5 +48,6 @@
             <p style="font-weight: bold;color: red;width:500px;">Sorry, data could not be retrieved:<br>
                 ${errMsg}</p>
         </c:if>
+            <a href="index.html">Back to Menu</a>
     </body>
 </html>
