@@ -60,6 +60,30 @@ public class MySqlDBStrategy implements DbStrategy, Serializable {
         }
         return records;
     }
+    
+    @Override
+    public List<Map<String, Object>> findRecordByPK(String tableName, String primaryKey, int value) throws Exception {
+        // SELECT * FROM author WHERE author_id = 1
+        String sql = "SELECT * FROM " + tableName + " WHERE " + primaryKey + " = ?";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setObject(1, value);
+        
+        ResultSet rs = pstmt.executeQuery();
+        List<Map<String, Object>> records = new ArrayList<>();
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int colCount = rsmd.getColumnCount();
+
+        while (rs.next()) {
+            Map<String, Object> record = new LinkedHashMap<>();
+            for (int i = 1; i < colCount + 1; i++) {
+                String colName = rsmd.getColumnName(i);
+                Object colData = rs.getObject(colName);
+                record.put(colName, colData);
+            }
+            records.add(record);
+        }
+        return records;
+    }
 
     @Override
     public int deleteRecordByPK(String tableName, String primaryKey, int value) throws Exception {
@@ -131,11 +155,12 @@ public class MySqlDBStrategy implements DbStrategy, Serializable {
 //        ArrayList<Object> newRecordValues = new ArrayList<>();
 //        newRecordValues.add("Mike Schoenauer");
 //        newRecordValues.add(new Date(2015,4,19));
-        int recordsUpdated = db.updateRecordByPrimaryKey("author", "author_name", "Steven Schoenauer", "author_id", 4);
+//        int recordsUpdated = db.updateRecordByPrimaryKey("author", "author_name", "Steven Schoenauer", "author_id", 4);
 
-        System.out.println(recordsUpdated);
+//        System.out.println(recordsUpdated);
 
-        List<Map<String, Object>> records = db.findAllRecords("author", 500);
+        List<Map<String, Object>> records = db.findRecordByPK("author", "author_id", 2);
+        //List<Map<String, Object>> records = db.findAllRecords("author", 500);
         System.out.println(records);
 
         db.closeConnection();

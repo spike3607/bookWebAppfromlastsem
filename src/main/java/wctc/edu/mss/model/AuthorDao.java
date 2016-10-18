@@ -67,6 +67,23 @@ public class AuthorDao implements AuthorDaoStrategy, Serializable {
 
     }
 
+    public Author getAuthorByID(Object key) throws Exception {
+        List<Map<String, Object>> rawData = db.findRecordByPK("author", "author_id", (int) key);
+        
+        Author author = new Author();
+        Object obj = rawData.get(1).get("author_id");
+        author.setAuthorId(Integer.parseInt(obj.toString()));
+
+        String name = rawData.get(1).get("author_name") == null ? "" : rawData.get(1).get("author_name").toString();
+        author.setAuthorName(name);
+
+        obj = rawData.get(1).get("date_added");
+        Date dateAdded = (obj == null) ? new Date() : (Date) rawData.get(1).get("date_added");
+        author.setDateAdded(dateAdded);
+
+        return author;
+    }
+
     @Override
     public void addAuthor(String name, Date date) throws Exception {
         db.openConnection(driverClassName, url, userName, password);

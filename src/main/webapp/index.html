@@ -4,14 +4,16 @@
     <head>
         <title>Book Demo App</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     </head>
     <body>
-        <h1>Choose an Option</h1>
-        <ol>
-            <li><a href="AuthorController?action=list">View all Authors</a></li>
-            <li><a href="addAuthor.jsp">Add New Author</a></li>
-            <li><a href="AuthorController?action=update">Update an Author</a></li>
-            <li><a href="AuthorController?action=delete">Delete an Author</a></li>
-        </ol>
+        <h1>Please Enter Your Name</h1>
+        <form method="POST" action="AuthorController?action=nameEntry">
+            Your Name: 
+            <input type="text" id="nameEntry" autofocus required>
+            <br>
+            <input type="submit" id="submit" name="submit" value="Confirm">
+        </form>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     </body>
 </html>

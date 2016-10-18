@@ -15,6 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import wctc.edu.mss.model.Author;
 import wctc.edu.mss.model.AuthorDao;
 import wctc.edu.mss.model.AuthorDaoStrategy;
@@ -27,30 +28,34 @@ import wctc.edu.mss.model.MySqlDBStrategy;
  * @author Spike
  */
 @WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
-public class AuthorController extends HttpServlet {    
+public class AuthorController extends HttpServlet {
+
     private DbStrategy db;
-    
+
+    private String webmasterEmail;
+
     private String driverClassName;
     private String url;
     private String userName;
     private String password;
-    
+
     @Inject
     private AuthorService authService;
-    
+
     @Override
     public void init() throws ServletException {
-        this.driverClassName = "com.mysql.jdbc.Driver";
-        this.url = "jdbc:mysql://localhost:3306/book";
-        this.userName = "root";
-        this.password = "admin";
+        this.driverClassName = getServletContext().getInitParameter("db.driver.class");
+        this.url = getServletContext().getInitParameter("db.url");
+        this.userName = getServletContext().getInitParameter("db.username");
+        this.password = getServletContext().getInitParameter("db.password");
+
+        webmasterEmail = getServletContext().getInitParameter("webmaster-email");
     }
-    
+
     private void configDbConnection() {
         authService.getDao().initDao(driverClassName, url, userName, password);
     }
-    
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -64,15 +69,17 @@ public class AuthorController extends HttpServlet {
             throws ServletException, IOException, Exception {
         response.setContentType("text/html;charset=UTF-8");
         
+        HttpSession session = request.getSession();
+        
+
         String destination = "/index.html";
         String action = request.getParameter("action");
-        
-        
-        
+
         try {
-            
+
             configDbConnection();
-             
+
+            
             if (action.equals("list")) {
                 List<Author> authors = null;
                 authors = authService.getAuthorList();
@@ -80,50 +87,70 @@ public class AuthorController extends HttpServlet {
                 destination = "/listAuthors.jsp";
 
             } else if (action.equals("add")) {
-//                // Hard coded for now
-//                authService.addAuthor("Kyle Hoof", new Date());
 
                 String newName = request.getParameter("newName");
                 System.out.println(newName);
                 authService.addAuthor(newName, new Date());
-                
-                List<Author> authors = null;
-                authors = authService.getAuthorList();
-                request.setAttribute("authors", authors);
-                destination = "/listAuthors.jsp";               
-                
-            } else if (action.equals("update")) {
-                // Hard code for now
-                authService.updateAuthor(4,"author_name","Test Schoenauer");
-                
+
                 List<Author> authors = null;
                 authors = authService.getAuthorList();
                 request.setAttribute("authors", authors);
                 destination = "/listAuthors.jsp";
-                
-            } else if (action.equals("delete")) {
-//                // Hard Coded
-//                authService.deleteAuthor(5);
 
-                String id = request.getParameter("id");
+            } else if (action.equals("update")) {
+                String column2edit = request.getParameter("colEdit");
+                if (column2edit.equals("name")) {
+                    String newName = request.getParameter("new_name");
+                    String id = request.getParameter("author_id");
+
+                    authService.updateAuthor(Integer.parseInt(id), "author_name", newName);
+                } else if (column2edit.equals("date")) {
+                    String newDate = request.getParameter("new_date");
+                    String id = request.getParameter("author_id");
+
+                    authService.updateAuthor(Integer.parseInt(id), "date_added", newDate);
+                } else {
+                    // Error
+                    System.out.println("Unable to find  parameter");
+                }
+
+                List<Author> authors = null;
+                authors = authService.getAuthorList();
+                request.setAttribute("authors", authors);
+                destination = "/listAuthors.jsp";
+
+            } else if (action.equals("delete")) {
+
+                String id = request.getParameter("deleteID");
                 System.out.println(id);
                 authService.deleteAuthor(Integer.valueOf(id));
+
+                List<Author> authors = null;
+                authors = authService.getAuthorList();
+                request.setAttribute("authors", authors);
+                destination = "/listAuthors.jsp";
+
+            } else if (action.equals("nameEntry")) {
+                String newName = request.getParameter("nameEntry");
+                System.out.println(newName);
+                session.setAttribute("sessionName", newName);
                 
                 List<Author> authors = null;
                 authors = authService.getAuthorList();
                 request.setAttribute("authors", authors);
                 destination = "/listAuthors.jsp";
-                
-            } else {
+            }
+            
+            
+            else {
                 // Error
                 System.out.println("Unable to find action parameter");
             }
-            
+
         } catch (Exception e) {
             request.setAttribute("errTxt", e.getCause().getLocalizedMessage());
         }
-               
-        
+
         RequestDispatcher view = request.getRequestDispatcher(destination);
         view.forward(request, response);
     }
@@ -141,9 +168,8 @@ public class AuthorController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-        processRequest(request, response);
-        }
-        catch (Exception e){
+            processRequest(request, response);
+        } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }
     }
@@ -160,9 +186,8 @@ public class AuthorController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-        processRequest(request, response);
-        }
-        catch (Exception e){
+            processRequest(request, response);
+        } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }
     }

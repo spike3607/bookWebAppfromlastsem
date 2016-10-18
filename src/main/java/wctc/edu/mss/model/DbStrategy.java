@@ -17,6 +17,8 @@ public interface DbStrategy {
     void closeConnection() throws Exception;
 
     List<Map<String, Object>> findAllRecords(String tableName, int maxRecords) throws Exception;
+    
+    List<Map<String, Object>> findRecordByPK(String tableName, String primaryKey, int value) throws Exception;
 
     void openConnection(String driverClass, String url, String userName, String password) throws Exception;
     
